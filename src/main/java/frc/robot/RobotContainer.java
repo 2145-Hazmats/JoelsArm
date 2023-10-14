@@ -44,16 +44,19 @@ public class RobotContainer {
       m_ArmSubsystem.enable();
     }, m_ArmSubsystem));
     m_driverController.b().onTrue(Commands.run(() -> {
-      m_ArmSubsystem.setGoal(30.0);
+      m_ArmSubsystem.setGoal(3000.0);
       m_ArmSubsystem.enable();
     }, m_ArmSubsystem));
     m_driverController.x().onTrue(Commands.run(() -> {
-      m_ArmSubsystem.setGoal(-30.0);
+      m_ArmSubsystem.setGoal(-3000.0);
       m_ArmSubsystem.enable();
     }, m_ArmSubsystem));
     m_driverController.y().onTrue(Commands.run(() -> {
-      m_ArmSubsystem.setGoal(60.0);
+      m_ArmSubsystem.setGoal(6000.0);
       m_ArmSubsystem.enable();
+    }, m_ArmSubsystem));
+    m_driverController.back().onTrue(Commands.run(() -> {
+      m_ArmSubsystem.disable();
     }, m_ArmSubsystem));
   }
   
