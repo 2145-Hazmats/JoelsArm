@@ -16,4 +16,9 @@ public final class Constants {
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
   }
+  public static class ArmConstants {
+    public static final int kArmMotorID = 14;
+    public static final int kArmEncoderID = 15;
+    public static final double ArmSpeed = 0.20;
+  }
 }
