@@ -21,14 +21,15 @@ public class ArmSubsystem extends ProfiledPIDSubsystem {
       // The ProfiledPIDController used by the subsystem
       new ProfiledPIDController(
         Constants.ArmConstants.ArmkP,
-        0.0,
-        0.0,
-        // The motion profile constraints
+        Constants.ArmConstants.ArmkI,
+        Constants.ArmConstants.ArmkD,
+        // The motion profile constraints. Velocity + Acceleration from constants
         new TrapezoidProfile.Constraints(Constants.ArmConstants.MaxArmVelocity, Constants.ArmConstants.MaxArmAcceleration)));
+    // reset encoder to 0 when code is deployed. Not when the robot is enabled/disabled btw
     m_Arm1.setSelectedSensorPosition(0.0);
   }
 
-  // Declare
+  // Declare motors + group
   private final WPI_TalonSRX m_Arm1 = new WPI_TalonSRX(Constants.ArmConstants.kArmMotor1ID);
   private final WPI_TalonSRX m_Arm2 = new WPI_TalonSRX(Constants.ArmConstants.kArmMotor2ID);
   private final MotorControllerGroup m_ArmGroup = new MotorControllerGroup(m_Arm1, m_Arm2);
@@ -36,25 +37,23 @@ public class ArmSubsystem extends ProfiledPIDSubsystem {
   @Override
   public void useOutput(double output, TrapezoidProfile.State setpoint) {
     // Use the output (and optionally the setpoint) here
-    SmartDashboard.putNumber(("Arm PID output"), output*Constants.ArmConstants.ArmSpeed);
-    m_ArmGroup.set(output*Constants.ArmConstants.ArmSpeed);
+    SmartDashboard.putNumber(("Arm PID output"), output);
+    m_ArmGroup.set(output);
   }
 
   @Override
   public double getMeasurement() {
     // Return the process variable measurement here
     SmartDashboard.putNumber(("Arm getMeasurement"), m_Arm1.getSelectedSensorPosition()/(Constants.ArmConstants.PulsesPerDegree));
+    // Return arm rotation in degrees
     return (m_Arm1.getSelectedSensorPosition()/(Constants.ArmConstants.PulsesPerDegree));
   }
 
-  @Override
-  public void periodic() {
-    SmartDashboard.putNumber(("Arm Position"), m_Arm1.getSelectedSensorPosition()/(Constants.ArmConstants.PulsesPerDegree));
-  }
-
+  // Runs the arm manually. Not implemented. Don't use a default command for this.
   public void ArmTurnMethod(double speed) {
-    m_ArmGroup.set(speed*0.25);
-    SmartDashboard.putNumber(("Arm manual speed"), speed*0.25);
+    m_ArmGroup.set(speed*Constants.ArmConstants.ArmSpeed);
+    SmartDashboard.putNumber(("Arm manual speed"), speed*Constants.ArmConstants.ArmSpeed);
+    SmartDashboard.putNumber(("Arm Position"), m_Arm1.getSelectedSensorPosition()/(Constants.ArmConstants.PulsesPerDegree));
   }
 
 }

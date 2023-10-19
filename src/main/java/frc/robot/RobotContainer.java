@@ -6,6 +6,7 @@ package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.ArmSubsystem;
+
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -18,7 +19,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private ArmSubsystem m_ArmSubsystem = new ArmSubsystem();
+  public ArmSubsystem m_ArmSubsystem = new ArmSubsystem();
 
   private final CommandXboxController m_driverController =
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
@@ -27,10 +28,6 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the trigger bindings
     configureBindings();
-
-    m_ArmSubsystem.setDefaultCommand(
-      Commands.run(
-        () -> m_ArmSubsystem.ArmTurnMethod(m_driverController.getLeftY()), m_ArmSubsystem));
   }
 
   /**
@@ -43,25 +40,29 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    m_driverController.a().onTrue(Commands.run(() -> {
+
+    // PIDs set at specific angles
+    m_driverController.a().onTrue(Commands.runOnce(() -> {
       m_ArmSubsystem.setGoal(0.0);
       m_ArmSubsystem.enable();
     }, m_ArmSubsystem));
-    m_driverController.b().onTrue(Commands.run(() -> {
-      m_ArmSubsystem.setGoal(10.0);
+    m_driverController.b().onTrue(Commands.runOnce(() -> {
+      m_ArmSubsystem.setGoal(30.0);
       m_ArmSubsystem.enable();
     }, m_ArmSubsystem));
-    m_driverController.x().onTrue(Commands.run(() -> {
-      m_ArmSubsystem.setGoal(-10.0);
+    m_driverController.x().onTrue(Commands.runOnce(() -> {
+      m_ArmSubsystem.setGoal(-60.0);
       m_ArmSubsystem.enable();
     }, m_ArmSubsystem));
-    m_driverController.y().onTrue(Commands.run(() -> {
-      m_ArmSubsystem.setGoal(20.0);
+    m_driverController.y().onTrue(Commands.runOnce(() -> {
+      m_ArmSubsystem.setGoal(60.0);
       m_ArmSubsystem.enable();
     }, m_ArmSubsystem));
-    m_driverController.back().onTrue(Commands.run(() -> {
+    // Disable PID button
+    m_driverController.back().onTrue(Commands.runOnce(() -> {
       m_ArmSubsystem.disable();
     }, m_ArmSubsystem));
+
   }
   
 }
