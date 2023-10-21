@@ -19,11 +19,13 @@ public final class Constants {
   public static class ArmConstants {
     // ID
     public static final int kMotorID = 4;
+    // Encoder multiplier
+    public static final double EncoderToAngle = 180/124.6;
     // Speed multiplier
-    public static final double ManualSpeed = 0.5;
+    public static final double ManualSpeed = 0.3;
     // TurnToAngle constants
-    public static final double TurnToSpeed = 0.5;
-    public static final double DegreeOfError = 1.0;
-    public static final double SlowMultiplier = 18.0;
+    public static final double TurnToSpeed = 1.0;
+    public static final double DegreeOfError = 0.5;
+    public static final double SlowMultiplier = 20.0;
   }
 }

@@ -69,13 +69,13 @@ public class RobotContainer {
       Commands.run(() -> m_ArmSubsystem.ArmTurnToAngle(0.0), m_ArmSubsystem)
     );
     m_driverController.b().onTrue(
-      Commands.run(() -> m_ArmSubsystem.ArmTurnToAngle(30.0), m_ArmSubsystem)
+      Commands.run(() -> m_ArmSubsystem.ArmTurnToAngle(90.0), m_ArmSubsystem)
     );
     m_driverController.x().onTrue(
-      Commands.run(() -> m_ArmSubsystem.ArmTurnToAngle(-30.0), m_ArmSubsystem)
+      Commands.run(() -> m_ArmSubsystem.ArmTurnToAngle(-90.0), m_ArmSubsystem)
     );
     m_driverController.y().onTrue(
-      Commands.run(() -> m_ArmSubsystem.ArmTurnToAngle(60.0), m_ArmSubsystem)
+      Commands.run(() -> m_ArmSubsystem.ArmTurnToAngle(120.0), m_ArmSubsystem)
     );
 
     m_driverController.leftBumper().whileTrue(m_ArmSubsystem.ArmTurnCommand(-0.5));

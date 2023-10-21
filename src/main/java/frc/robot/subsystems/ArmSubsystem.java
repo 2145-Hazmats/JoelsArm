@@ -19,13 +19,8 @@ public class ArmSubsystem extends SubsystemBase {
   public ArmSubsystem() {
     // reset encoder to 0 when code is deployed. Not when the robot is enabled/disabled btw
     m_RelativeEncoder.setPosition(0.0);
-    // Approximately correct conversion factors
-    m_RelativeEncoder.setPositionConversionFactor(1.45);
-    m_RelativeEncoder.setVelocityConversionFactor(1.45);
-    // Put informational variables we don't change on SmartDashboard
-    SmartDashboard.putNumber(("CountsPerRevolution"), m_RelativeEncoder.getCountsPerRevolution());
-    SmartDashboard.putNumber(("MeasurementPeriod"), m_RelativeEncoder.getMeasurementPeriod());
-    SmartDashboard.putBoolean(("Inverted"), m_RelativeEncoder.getInverted());
+    // Set conversion factor
+    m_RelativeEncoder.setPositionConversionFactor(Constants.ArmConstants.EncoderToAngle);
   }
 
   private final CANSparkMax m_Arm = new CANSparkMax(4, MotorType.kBrushless);
@@ -34,7 +29,6 @@ public class ArmSubsystem extends SubsystemBase {
   // Runs the arm manually. Positive speed is clockwise
   public void ArmTurnMethod(double speed) {
     m_Arm.set(speed*Constants.ArmConstants.ManualSpeed);
-    SmartDashboard.putNumber(("Position"), m_RelativeEncoder.getPosition());
   }
 
   // Command for ArmTurnMethod
@@ -59,14 +53,14 @@ public class ArmSubsystem extends SubsystemBase {
       Math.min(1.0, Math.max((angle - m_RelativeEncoder.getPosition())/Constants.ArmConstants.SlowMultiplier, 0.0)));
     }
     // Display SmartDashboard
-    SmartDashboard.putNumber(("Position:"), m_RelativeEncoder.getPosition());
     SmartDashboard.putNumber(("Goal:"), angle);
-    SmartDashboard.putNumber(("Speed:"), Constants.ArmConstants.TurnToSpeed*Math.min(1.0, Math.max((angle - m_RelativeEncoder.getPosition())/Constants.ArmConstants.SlowMultiplier, 0.0))*100);
+    SmartDashboard.putNumber(("Speed:"), Constants.ArmConstants.TurnToSpeed*Math.min(1.0, Math.max((angle - m_RelativeEncoder.getPosition())/Constants.ArmConstants.SlowMultiplier, -1.0))*100);
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    SmartDashboard.putNumber(("Position"), m_RelativeEncoder.getPosition());
   }
 
 }
