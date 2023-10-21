@@ -42,6 +42,7 @@ public class RobotContainer {
   private void configureBindings() {
 
     // PIDs set at specific angles
+    /*
     m_driverController.a().onTrue(Commands.runOnce(() -> {
       m_ArmSubsystem.setGoal(0.0);
       m_ArmSubsystem.enable();
@@ -62,6 +63,23 @@ public class RobotContainer {
     m_driverController.back().onTrue(Commands.runOnce(() -> {
       m_ArmSubsystem.disable();
     }, m_ArmSubsystem));
+    */
+
+    m_driverController.a().onTrue(
+      Commands.run(() -> m_ArmSubsystem.ArmTurnToAngle(0.0), m_ArmSubsystem)
+    );
+    m_driverController.b().onTrue(
+      Commands.run(() -> m_ArmSubsystem.ArmTurnToAngle(30.0), m_ArmSubsystem)
+    );
+    m_driverController.x().onTrue(
+      Commands.run(() -> m_ArmSubsystem.ArmTurnToAngle(-30.0), m_ArmSubsystem)
+    );
+    m_driverController.y().onTrue(
+      Commands.run(() -> m_ArmSubsystem.ArmTurnToAngle(60.0), m_ArmSubsystem)
+    );
+
+    m_driverController.leftBumper().whileTrue(m_ArmSubsystem.ArmTurnCommand(-0.5));
+    m_driverController.rightBumper().whileTrue(m_ArmSubsystem.ArmTurnCommand(0.5));
 
   }
   

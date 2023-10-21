@@ -4,56 +4,69 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.ProfiledPIDSubsystem;
-
-public class ArmSubsystem extends ProfiledPIDSubsystem {
+public class ArmSubsystem extends SubsystemBase {
   /** Creates a new ArmSubsystem2. */
   public ArmSubsystem() {
-    super(
-      // The ProfiledPIDController used by the subsystem
-      new ProfiledPIDController(
-        Constants.ArmConstants.ArmkP,
-        Constants.ArmConstants.ArmkI,
-        Constants.ArmConstants.ArmkD,
-        // The motion profile constraints. Velocity + Acceleration from constants
-        new TrapezoidProfile.Constraints(Constants.ArmConstants.MaxArmVelocity, Constants.ArmConstants.MaxArmAcceleration)));
     // reset encoder to 0 when code is deployed. Not when the robot is enabled/disabled btw
-    m_Arm1.setSelectedSensorPosition(0.0);
+    m_RelativeEncoder.setPosition(0.0);
+    // Approximately correct conversion factors
+    m_RelativeEncoder.setPositionConversionFactor(1.45);
+    m_RelativeEncoder.setVelocityConversionFactor(1.45);
+    // Put informational variables we don't change on SmartDashboard
+    SmartDashboard.putNumber(("CountsPerRevolution"), m_RelativeEncoder.getCountsPerRevolution());
+    SmartDashboard.putNumber(("MeasurementPeriod"), m_RelativeEncoder.getMeasurementPeriod());
+    SmartDashboard.putBoolean(("Inverted"), m_RelativeEncoder.getInverted());
   }
 
-  // Declare motors + group
-  private final WPI_TalonSRX m_Arm1 = new WPI_TalonSRX(Constants.ArmConstants.kArmMotor1ID);
-  private final WPI_TalonSRX m_Arm2 = new WPI_TalonSRX(Constants.ArmConstants.kArmMotor2ID);
-  private final MotorControllerGroup m_ArmGroup = new MotorControllerGroup(m_Arm1, m_Arm2);
+  private final CANSparkMax m_Arm = new CANSparkMax(4, MotorType.kBrushless);
+  private final RelativeEncoder m_RelativeEncoder = m_Arm.getEncoder();
 
-  @Override
-  public void useOutput(double output, TrapezoidProfile.State setpoint) {
-    // Use the output (and optionally the setpoint) here
-    SmartDashboard.putNumber(("Arm PID output"), output);
-    m_ArmGroup.set(output);
-  }
-
-  @Override
-  public double getMeasurement() {
-    // Return the process variable measurement here
-    SmartDashboard.putNumber(("Arm getMeasurement"), m_Arm1.getSelectedSensorPosition()/(Constants.ArmConstants.PulsesPerDegree));
-    // Return arm rotation in degrees
-    return (m_Arm1.getSelectedSensorPosition()/(Constants.ArmConstants.PulsesPerDegree));
-  }
-
-  // Runs the arm manually. Not implemented. Don't use a default command for this.
+  // Runs the arm manually. Positive speed is clockwise
   public void ArmTurnMethod(double speed) {
-    m_ArmGroup.set(speed*Constants.ArmConstants.ArmSpeed);
-    SmartDashboard.putNumber(("Arm manual speed"), speed*Constants.ArmConstants.ArmSpeed);
-    SmartDashboard.putNumber(("Arm Position"), m_Arm1.getSelectedSensorPosition()/(Constants.ArmConstants.PulsesPerDegree));
+    m_Arm.set(speed*Constants.ArmConstants.ManualSpeed);
+    SmartDashboard.putNumber(("Position"), m_RelativeEncoder.getPosition());
+  }
+
+  // Command for ArmTurnMethod
+  public Command ArmTurnCommand(double speed) {
+    return new StartEndCommand(()->this.ArmTurnMethod(speed), ()->this.ArmTurnMethod(0.0), this);
+  }
+
+  // Turn the arm to a specified angle. Slows down based on the current arm angle
+  public void ArmTurnToAngle(double angle) {
+    // Stop if angle is close enough
+    if (Math.abs(m_RelativeEncoder.getPosition() - angle) <= Constants.ArmConstants.DegreeOfError) {
+      m_Arm.stopMotor();
+    }
+    // Spin counter-clockwise
+    else if ((m_RelativeEncoder.getPosition() - angle) > 0) {
+      m_Arm.set(-Constants.ArmConstants.TurnToSpeed*
+      Math.min(1.0, Math.max((m_RelativeEncoder.getPosition() - angle)/Constants.ArmConstants.SlowMultiplier, 0.0)));
+    }
+    // Spin clockwise
+    else if ((m_RelativeEncoder.getPosition() - angle) < 0) {
+      m_Arm.set(Constants.ArmConstants.TurnToSpeed*
+      Math.min(1.0, Math.max((angle - m_RelativeEncoder.getPosition())/Constants.ArmConstants.SlowMultiplier, 0.0)));
+    }
+    // Display SmartDashboard
+    SmartDashboard.putNumber(("Position:"), m_RelativeEncoder.getPosition());
+    SmartDashboard.putNumber(("Goal:"), angle);
+    SmartDashboard.putNumber(("Speed:"), Constants.ArmConstants.TurnToSpeed*Math.min(1.0, Math.max((angle - m_RelativeEncoder.getPosition())/Constants.ArmConstants.SlowMultiplier, 0.0))*100);
+  }
+
+  @Override
+  public void periodic() {
+    // This method will be called once per scheduler run
   }
 
 }

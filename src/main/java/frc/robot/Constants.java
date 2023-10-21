@@ -17,19 +17,13 @@ public final class Constants {
     public static final int kDriverControllerPort = 0;
   }
   public static class ArmConstants {
-    // Motor IDs
-    public static final int kArmMotor1ID = 0;
-    public static final int kArmMotor2ID = 1;
-    // Math constants
-    public static final int PulsesPerRevolution = 4096;
-    public static final double PulsesPerDegree = 11.377777; //(4096/360)
-    // PID constants
-    public static final double ArmkP = 0.055;
-    public static final double ArmkI = 0.0;
-    public static final double ArmkD = 0.0;
-    public static final double MaxArmVelocity = 10.0;
-    public static final double MaxArmAcceleration = 50.0;
-    // Manual speed
-    public static final double ArmSpeed = 0.25;
+    // ID
+    public static final int kMotorID = 4;
+    // Speed multiplier
+    public static final double ManualSpeed = 0.5;
+    // TurnToAngle constants
+    public static final double TurnToSpeed = 0.5;
+    public static final double DegreeOfError = 1.0;
+    public static final double SlowMultiplier = 18.0;
   }
 }
